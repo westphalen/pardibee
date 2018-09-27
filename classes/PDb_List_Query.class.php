@@ -562,6 +562,16 @@ class PDb_List_Query {
    */
   private function search_term_is_valid( $term )
   {
+      if (is_array($term)) {
+          foreach ($term as $subTerm) {
+              if (!$this->search_term_is_valid($subTerm)) {
+                  return false;
+              }
+          }
+
+          return true;
+      }
+
     $valid = strlen( trim( $term, '*?_%.' ) ) > 0 || ( Participants_Db::plugin_setting_is_true('empty_search') && $term === '' );
     return Participants_Db::apply_filters( 'search_term_tests_valid', $valid, $term );
   }
