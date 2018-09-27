@@ -1458,4 +1458,37 @@ abstract class PDb_Shortcode {
       $this->instance_index = empty( $index ) ? Participants_Db::$instance_index : $index;
   }
 
+    public function get_field($name)
+    {
+        if ($this->fields && array_key_exists($name, $this->fields)) {
+            return $this->fields[$name];
+        } else if ($this->group && $this->group->fields && array_key_exists($name, $this->group->fields)) {
+            return $this->group->fields[$name];
+        } else if ($this->record && $this->record->fields && array_key_exists($name, $this->record->fields)) {
+            return $this->record->fields[$name];
+        }
+
+        return null;
+    }
+
+    public function get_field_value($field_name)
+    {
+        $field = $this->get_field($field_name);
+
+        if ($field)	{
+            return $field->value();
+        }
+
+        return null;
+    }
+
+    public function print_field_value($field_name)
+    {
+        $field = $this->get_field($field_name);
+
+        if ($field) {
+            echo PDb_FormElement::get_field_value_display($field);
+        }
+    }
+
 }
