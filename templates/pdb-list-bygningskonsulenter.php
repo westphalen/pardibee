@@ -81,38 +81,52 @@ function force_url($url) {
 
         <tbody>
         <?php while ( $this->have_records() ) : $this->the_record(); // each record is one row  ?>
-        <?php $colspan = 0; ?>
           <tr>
               <?php while ( $this->have_fields() ) : $this->the_field(); // each field is one cell  ?>
 
                   <?php if (in_array($this->field->name, ['hjemmeside', 'certificeret'])) continue; ?>
 
-                <td class="<?php echo $this->field->name ?>-field">
-                    <?php if ($this->field->name == 'navn' && ($website = $this->get_field_value('hjemmeside'))) : ?>
-                  <a href="<?= force_url($website) ?>" target="_blank">
+                <td
+                        class="<?php echo $this->field->name ?>-field"
+                    <?php if ($this->field->name == 'faggruppe') : ?>
+                      style="min-width: 250px;"
+                    <?php endif ?>
+                >
+                      <?php if ($this->field->name == 'navn' && ($website = $this->get_field_value('hjemmeside'))) : ?>
+                        <a href="<?= force_url($website) ?>" target="_blank">
                       <?php endif ?>
-                      <?php $this->field->print_value() ?>
-                      <?php if ($website) : ?>
-                  </a>
-                <?php endif ?>
+
+                      <?php if ($this->field->name != 'faggruppe') $this->field->print_value() ?>
+                      <?php if ($this->field->name == 'faggruppe') {
+                          ob_start();
+                          $this->field->print_value();
+                          $faggruppeValue = ob_get_clean();
+
+                          $faggruppeArray = explode(', ', $faggruppeValue);
+                          $trykIndex = array_search('Trykprøve/tæthedsprøve', $faggruppeArray);
+
+                          if ($trykIndex !== false) {
+                            unset($faggruppeArray[$trykIndex]);
+
+                            echo implode(', ', $faggruppeArray),
+                              count($faggruppeArray) > 0 ? ', ' : '',
+                              'Trykprøve/tæthedsprøve';
+                          } else {
+                            echo $faggruppeValue;
+                          }
+
+                          if ($this->get_field_value('certificeret')) {
+                              echo '<br />Certificeret i tryk- og tæthedsprøvning';
+                          }
+                      } ?>
+
+                      <?php if (isset($website) && $website) : ?>
+                        </a>
+                      <?php endif ?>
                 </td>
 
-              <?php $colspan++; ?>
               <?php endwhile; // each field  ?>
           </tr>
-
-          <?php if ($this->get_field_value('certificeret')): ?>
-            <tr>
-              <td colspan="<?= $colspan ?>" style="text-align: center;">
-                <?php $this->print_field_value('navn') ?>
-                er certificeret
-                <?= in_array('tryk', $this->get_field_value('faggruppe') ?: [])
-                    ? 'indenfor tæthedsprøvning'
-                    : 'af Danske Bygningskonsulenter'
-                ?>
-              </td>
-            </tr>
-          <?php endif ?>
         <?php endwhile; // each record  ?>
         </tbody>
 
