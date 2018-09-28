@@ -116,7 +116,7 @@ function force_url($url) {
                           }
 
                           if ($this->get_field_value('certificeret')) {
-                              echo '<br />Certificeret i tryk- og tæthedsprøvning';
+                              echo '<br /><i>Certificeret i tryk- og tæthedsprøvning</i>';
                           }
                       } ?>
 
